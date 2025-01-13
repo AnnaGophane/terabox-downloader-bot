@@ -15,6 +15,18 @@ from tools import generate_shortenedUrl, is_user_on_chat, remove_all_videos
 
 log = logging.getLogger(__name__)
 
+if __name__ == "__main__":
+    try:
+        print("Bot starting...")
+        print(f"Bot username: {BOT_USERNAME}")
+        # Check Redis connection
+        check_redis_connection()
+        # Start the bot
+        bot.run()
+    except Exception as e:
+        print(f"Startup error: {str(e)}")
+      
+
 bot = TelegramClient("bot", API_ID, API_HASH)
 
 
