@@ -1,9 +1,9 @@
-Import os
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-#class Config:
+class Config:
 # Bot Configuration
 API_ID = os.getenv('API_ID')
 API_HASH = os.getenv('API_HASH')
