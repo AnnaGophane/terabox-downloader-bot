@@ -8,6 +8,8 @@ class Config:
     REDIS_PORT = os.environ.get("REDIS_PORT", "")
     REDIS_PASS = os.environ.get("REDIS_PASS", "")
     OWNER = os.environ.get("Ravanraj21", "")  # Bot owner's username
+
+
 API_ID = 22620071  # api id
 API_HASH = "85b7c68ac5da126389cfb9bbb89a5190"  # api hash
 
