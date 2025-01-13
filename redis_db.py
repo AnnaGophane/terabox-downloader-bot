@@ -9,6 +9,21 @@ from redis import Redis as r
 
 from config import HOST, PASSWORD, PORT
 
+import redis
+import os
+
+redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+redis_client = redis.from_url(redis_url)
+
+def check_redis_connection():
+    try:
+        redis_client.ping()
+        print("Redis connection successful")
+        return True
+    except redis.ConnectionError as e:
+        print(f"Redis connection failed: {str(e)}")
+        return False
+
 log = logging.getLogger("telethon")
 
 
