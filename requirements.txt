@@ -1,4 +1,4 @@
-Python 3.9.21
+Python==3.9.21
 pyrogram==2.0.106
 tgcrypto
 redis
