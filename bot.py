@@ -1,7 +1,7 @@
 import os  # Add this at the top of the file
 from pyrogram import Client, filters
 from config import (ADMINS, API_HASH, API_ID, BOT_TOKEN, BOT_USERNAME,
-                   CHANNEL_ID, FORCE_SUB, OWNER_ID)
+                   PRIVATE_CHAT_ID, ADMINS)
 
 if __name__ == "__main__":
     try:
