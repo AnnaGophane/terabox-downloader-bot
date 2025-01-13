@@ -32,6 +32,16 @@ Hello there! I'm your friendly video downloader bot specially designed to fetch 
 
 Let's make your video experience even better!
 """
+  @bot.on_message(filters.regex(r'https?://.*terabox\.com/.*'))
+async def handle_terabox_link(client, message):
+    try:
+        print(f"Received Terabox link: {message.text}")  # Debug log
+        await message.reply_text("Processing your Terabox link... Please wait.")
+        # Rest of your code
+    except Exception as e:
+        print(f"Error processing link: {str(e)}")  # Debug log
+        await message.reply_text(f"Error occurred: {str(e)}")
+      
     await m.reply(
         reply_text,
         link_preview=False,
