@@ -1,7 +1,20 @@
-import os  # Add this at the top of the file
+import os
+import signal
+import sys
 from pyrogram import Client, filters
 from config import (ADMINS, API_HASH, API_ID, BOT_TOKEN, BOT_USERNAME,
                    PRIVATE_CHAT_ID, ADMINS)
+
+# Create a flag to indicate when the bot should stop
+should_stop = False
+
+def signal_handler(signum, frame):
+    global should_stop
+    print("Received shutdown signal, stopping bot...")
+    should_stop = True
+
+# Register the signal handler
+signal.signal(signal.SIGTERM, signal_handler)
 
 if __name__ == "__main__":
     try:
@@ -21,9 +34,24 @@ if __name__ == "__main__":
             api_hash=API_HASH,
             bot_token=BOT_TOKEN
         )
-        bot.run()
+        
+        # Start the bot
+        bot.start()
+        print("Bot started successfully!")
+        
+        # Keep the script running
+        while not should_stop:
+            pass
+        
+        # Gracefully stop the bot
+        print("Stopping bot...")
+        bot.stop()
+        print("Bot stopped successfully!")
+        
     except Exception as e:
         print(f"Startup error: {str(e)}")
+    finally:
+        sys.exit(0)
 
 #origanal
 import logging
