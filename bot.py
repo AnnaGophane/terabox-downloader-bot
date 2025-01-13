@@ -1,3 +1,31 @@
+import os  # Add this at the top of the file
+from pyrogram import Client, filters
+from config import (ADMINS, API_HASH, API_ID, BOT_TOKEN, BOT_USERNAME,
+                   CHANNEL_ID, FORCE_SUB, OWNER_ID)
+
+if __name__ == "__main__":
+    try:
+        print("=== Bot Startup ===")
+        print("Checking environment variables...")
+        required_vars = ['API_ID', 'API_HASH', 'BOT_TOKEN', 'REDIS_URL']
+        for var in required_vars:
+            if os.getenv(var):
+                print(f"✅ {var} is set")
+            else:
+                print(f"❌ {var} is missing!")
+        
+        print("\nStarting bot...")
+        bot = Client(
+            "TeraBoxBot",
+            api_id=API_ID,
+            api_hash=API_HASH,
+            bot_token=BOT_TOKEN
+        )
+        bot.run()
+    except Exception as e:
+        print(f"Startup error: {str(e)}")
+
+#origanal
 import logging
 import time
 
