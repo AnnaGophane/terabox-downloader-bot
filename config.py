@@ -10,7 +10,7 @@ class Config:
     REDIS_URI = os.environ.get("REDIS_URL", "") # Heroku Redis URL
     REDIS_PORT = os.environ.get("REDIS_PORT", "")
     REDIS_PASS = os.environ.get("REDIS_PASS", "")
-    OWNER = os.environ.get("OWNER", "")  # Bot owner's username
+    OWNER_USERNAME = os.environ.get("OWNER", "")  # Bot owner's username
 
 # REDIS
 HOST = "redis-14201.c15.us-east-1-2.ec2.redns.redis-cloud.com:14201"  # redis host uri
