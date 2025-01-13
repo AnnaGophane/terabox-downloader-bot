@@ -3,14 +3,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class Config:
-    API_ID = os.environ.get("API_ID", "")
-    API_HASH = os.environ.get("API_HASH", "")
-    BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
-    REDIS_URI = os.environ.get("REDIS_URL", "") # Heroku Redis URL
-    REDIS_PORT = os.environ.get("REDIS_PORT", "")
-    REDIS_PASS = os.environ.get("REDIS_PASS", "")
-    OWNER_USERNAME = os.environ.get("OWNER", "")  # Bot owner's username
+# Bot Configuration
+API_ID = os.getenv('API_ID')
+API_HASH = os.getenv('API_HASH')
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_USERNAME = os.getenv('BOT_USERNAME')
+ADMINS = list(map(int, os.getenv('ADMINS', '').split(',')))
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+
+# Terabox Configuration
+COOKIE = os.getenv('TERABOX_COOKIE', '')
+
 
 # REDIS
 HOST = "redis-14201.c15.us-east-1-2.ec2.redns.redis-cloud.com:14201"  # redis host uri
