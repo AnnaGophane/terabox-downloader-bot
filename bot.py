@@ -7,7 +7,7 @@ if __name__ == "__main__":
     try:
         print("=== Bot Startup ===")
         print("Checking environment variables...")
-        required_vars = ['API_ID', 'API_HASH', 'BOT_TOKEN', 'REDIS_URL']
+        required_vars = ['API_ID', 'API_HASH', 'BOT_TOKEN', 'HOST']
         for var in required_vars:
             if os.getenv(var):
                 print(f"✅ {var} is set")
