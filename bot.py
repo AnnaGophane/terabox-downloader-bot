@@ -17,14 +17,45 @@ log = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     try:
-        print("Bot starting...")
-        print(f"Bot username: {BOT_USERNAME}")
-        # Check Redis connection
-        check_redis_connection()
-        # Start the bot
+        print("=== Bot Startup ===")
+        print("Checking environment variables...")
+        required_vars = ['API_ID', 'API_HASH', 'BOT_TOKEN', 'REDIS_URL']
+        for var in required_vars:
+            if os.getenv(var):
+                print(f"✅ {var} is set")
+            else:
+                print(f"❌ {var} is missing!")
+        
+        print("\nStarting bot...")
         bot.run()
     except Exception as e:
         print(f"Startup error: {str(e)}")
+
+@bot.on_message(filters.regex(r'https?://.*terabox\.com/.*'))
+async def handle_terabox_link(client, message):
+    try:
+        print("=== Debug Info ===")
+        print(f"Received message: {message.text}")
+        print(f"From user: {message.from_user.id}")
+        
+        # Send acknowledgment
+        await message.reply_text("📥 Processing your Terabox link...")
+        
+        # Try to get the download link
+        download_link = await get_download_link(message.text)
+        print(f"Download link obtained: {download_link is not None}")
+        
+        if download_link:
+            await message.reply_text("✅ Download link generated!")
+            await message.reply_text(f"🔗 Link: {download_link}")
+        else:
+            await message.reply_text("❌ Failed to generate download link")
+            
+    except Exception as e:
+        print(f"Error in handle_terabox_link: {str(e)}")
+        await message.reply_text(f"❌ Error: {str(e)}")
+        
+    print("=== Debug End ===")
       
 
 bot = TelegramClient("bot", API_ID, API_HASH)
