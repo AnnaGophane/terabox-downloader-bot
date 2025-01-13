@@ -1,12 +1,10 @@
-python-telegram-bot==13.7
+python-3.10.x
 pyrogram==2.0.106
 tgcrypto
 redis
 python-dotenv
 requests
 aiohttp
-
-
 telethon
 cryptg
 pyaes
