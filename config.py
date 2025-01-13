@@ -3,13 +3,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+class Config:
+    API_ID = os.environ.get('API_ID')
+    API_HASH = os.environ.get('API_HASH')
+    BOT_TOKEN = os.environ.get('BOT_TOKEN')
+    REDIS_URL = os.environ.get('REDIS_URL')  # Heroku Redis URL if you're using Redis
+    
+    # Add any other configuration variables you need
+    OWNER_ID = os.environ.get('OWNER_ID')
+    AUTH_USERS = [int(x) for x in os.environ.get("AUTH_USERS", "").split(",") if x]
+
+
 # Bot Configuration
-API_ID = os.getenv('API_ID')
-API_HASH = os.getenv('API_HASH')
-BOT_TOKEN = os.getenv('BOT_TOKEN')
 BOT_USERNAME = os.getenv('BOT_USERNAME')
 ADMINS = list(map(int, os.getenv('ADMINS', '').split(',')))
-REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 
 # Terabox Configuration
 COOKIE = os.getenv('TERABOX_COOKIE', '')
