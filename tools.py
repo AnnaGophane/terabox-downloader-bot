@@ -54,7 +54,11 @@ def check_url_patterns(url: str) -> bool:
     return False
 
 
-def extract_code_from_url(url: str) -> str | None:
+from typing import Optional
+
+def extract_code_from_url(url: str) -> Optional[str]:
+    # Your function implementation here
+
     """
     Extracts the code from a URL.
 
