@@ -11,4 +11,4 @@ redis
 FastTelethonhelper
 humanreadable
 pillow
-pip freeze > requirements.txt
+
