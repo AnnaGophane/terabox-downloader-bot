@@ -70,8 +70,7 @@ async def handle_message(m: Message):
 
     if int(data["sizebytes"]) > 524288000 and m.sender_id not in ADMINS:
         return await hm.edit(
-            f"Sorry! File is too big.\n**I can download only 500MB and this file is of {
-                data['size']}.**\nRather you can download this file from the link below:\n{data['url']}",
+            f"Sorry! File is too big.\n**I can download only 500MB and this file is of {data['size']}.**\nRather you can download this file from the link below:\n{data['url']}",
             parse_mode="markdown",
         )
 
