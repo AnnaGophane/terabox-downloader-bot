@@ -40,8 +40,7 @@ async def handle_message(m: Message):
         ttl = db.ttl(m.sender_id)
         t = hr.Time(str(ttl), default_unit=hr.Time.Unit.SECOND)
         return await hm.edit(
-            f"You are spamming.\n**Please wait {
-                t.to_humanreadable()} and try again.**",
+            f"You are spamming.\n**Please wait {t.to_humanreadable()} and try again.**",
             parse_mode="markdown",
         )
     if_token_avl = db.get(f"active_{m.sender_id}")
