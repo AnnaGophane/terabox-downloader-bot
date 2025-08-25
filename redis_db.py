@@ -9,21 +9,6 @@ from redis import Redis as r
 
 from config import HOST, PASSWORD, PORT
 
-import redis
-import os
-
-redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
-redis_client = redis.from_url(redis_url)
-
-def check_redis_connection():
-    try:
-        redis_client.ping()
-        print("Redis connection successful")
-        return True
-    except redis.ConnectionError as e:
-        print(f"Redis connection failed: {str(e)}")
-        return False
-
 log = logging.getLogger("telethon")
 
 
@@ -90,15 +75,44 @@ class Redis(r):
         return self.set(key, value)
 
 
-db = Redis(
-    host=HOST,
-    port=PORT,
-    password=PASSWORD if len(PASSWORD) > 1 else None,
-    decode_responses=True,
-)
+# Try to use REDIS_URL from environment if available, otherwise use config values
+redis_url = os.getenv('REDIS_URL')
+if redis_url:
+    # Parse the URL and extract components
+    import urllib.parse
+    parsed = urllib.parse.urlparse(redis_url)
+    host = parsed.hostname
+    port = parsed.port or 6379
+    password = parsed.password
+    ssl = parsed.scheme == 'rediss'
+    
+    db = Redis(
+        host=host,
+        port=port,
+        password=password,
+        decode_responses=True,
+        ssl=ssl,
+        ssl_cert_reqs=None,
+    )
+else:
+    db = Redis(
+        host=HOST,
+        port=PORT,
+        password=PASSWORD if len(PASSWORD) > 1 else None,
+        decode_responses=True,
+        ssl=True,
+        ssl_cert_reqs=None,
+    )
 
 
-log.info(f"Starting redis on {HOST}:{PORT}")
+if redis_url:
+    log.info(f"Starting redis using URL: {redis_url}")
+else:
+    log.info(f"Starting redis on {HOST}:{PORT}")
+
 if not db.ping():
-    log.error(f"Redis is not available on {HOST}:{PORT}")
+    if redis_url:
+        log.error(f"Redis is not available at the provided URL")
+    else:
+        log.error(f"Redis is not available on {HOST}:{PORT}")
     exit(1)
