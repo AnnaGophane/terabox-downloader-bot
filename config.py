@@ -34,10 +34,19 @@ ADMINS = list(map(int, os.getenv('ADMINS', '').split(',')))
 COOKIE = os.getenv('TERABOX_COOKIE', '')
 
 
-# REDIS
-HOST = "redis-14201.c15.us-east-1-2.ec2.redns.redis-cloud.com"  # redis host uri
-PORT = 14201  # redis port
-PASSWORD = "1hlUwaWzkStWzk0AcdiSSUBIwkHBKARc"  # redis password
+# REDIS - Use environment variable if available, otherwise use hardcoded values
+REDIS_URL = os.getenv('REDIS_URL')
+if REDIS_URL:
+    # Parse the URL to extract components
+    from urllib.parse import urlparse
+    parsed = urlparse(REDIS_URL)
+    HOST = parsed.hostname
+    PORT = parsed.port or 6379
+    PASSWORD = parsed.password
+else:
+    HOST = "redis-14201.c15.us-east-1-2.ec2.redns.redis-cloud.com"  # redis host uri
+    PORT = 14201  # redis port
+    PASSWORD = "1hlUwaWzkStWzk0AcdiSSUBIwkHBKARc"  # redis password
 
 PRIVATE_CHAT_ID = -1002315965012  # CHAT WHERE YOU WANT TO STORE VIDEOS
 # COOKIE FOR AUTHENTICATION (get from chrome dev tools) ex: "PANWEB=1; csrfToken=;
