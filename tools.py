@@ -10,7 +10,7 @@ import requests
 from PIL import Image
 from telethon import TelegramClient
 
-from config import BOT_USERNAME, PUBLIC_EARN_API
+from config import CUTTLY_API_KEY
 from redis_db import db
 
 
@@ -272,20 +272,20 @@ def remove_all_videos():
 def generate_shortenedUrl(
     sender_id: int,
 ):
+    from config import BOT_USERNAME  # Move import here to avoid circular dependency
     try:
         uid = str(uuid.uuid4())
         data = requests.get(
-            "https://publicearn.com/api",
+            "https://cutt.ly/api/api.php",
             params={
-                "api": PUBLIC_EARN_API,
-                "url": f"https://t.me/{BOT_USERNAME}?start=token_{uid}",
-                "alias": uid.split("-", maxsplit=2)[0],
+                "key": CUTTLY_API_KEY,  # Use the cutt.ly API key from config
+                "short": f"https://t.me/{BOT_USERNAME}?start=token_{uid}",
             },
         )
         data.raise_for_status()
         data_json = data.json()
-        if data_json.get("status") == "success":
-            url = data_json.get("shortenedUrl")
+        if data_json.get("status") == 1:  # cutt.ly API uses status code 1 for success
+            url = data_json.get("shortUrl")
             db.set(f"token_{uid}", f"{sender_id}|{url}", ex=21600)
             return url
         else:
