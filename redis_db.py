@@ -12,7 +12,10 @@ from config import HOST, PASSWORD, PORT
 log = logging.getLogger("telethon")
 
 
-class Redis(r):
+class Redis(r):    
+    # In-memory cache
+    _in_memory_cache = {}
+    
 
     def __init__(
         self,
@@ -45,74 +48,123 @@ class Redis(r):
         try:
             super().__init__(**kwargs)
         except Exception as e:
-            logger.exception(f"Error while connecting to redis: {e}")
+            logger.error(f"❌ Error while connecting to Redis: {e}")
+            logger.error(f"   Host: {host}")
+            logger.error(f"   Port: {port}")
+            if "Name or service not known" in str(e):
+                logger.error("   DNS resolution failed - check if the hostname is correct")
+            elif "Connection refused" in str(e):
+                logger.error("   Connection refused - check if Redis server is running")
+            elif "timed out" in str(e):
+                logger.error("   Connection timed out - check network connectivity")
+            logger.error("Please verify your Redis configuration and ensure the server is accessible")
             sys.exit()
         self.logger = logger
         self._cache = {}
         threading.Thread(target=self.re_cache).start()
 
     def re_cache(self):
-        key = self.keys()
-        for keys in key:
-            self._cache[keys] = self.get(keys)
-        self.logger.info("Cached {} keys".format(len(self._cache)))
+        try:
+            key = self.keys()
+            for keys in key:
+                self._cache[keys] = self.get(keys)
+                self._in_memory_cache[keys] = self.get(keys)
+            self.logger.info("Cached {} keys from Redis".format(len(self._cache)))
+        except Exception as e:
+            self.logger.warning("Could not cache from Redis: {}. Using in-memory cache only.".format(e))
 
     def get_key(self, key: Any):
         if key in self._cache:
             return self._cache[key]
+        elif key in self._in_memory_cache:
+            return self._in_memory_cache[key]
         else:
-            data = self.get(key)
-            self._cache[key] = data
-            return data
+            try:
+                data = self.get(key)
+                if data:
+                    self._cache[key] = data
+                    self._in_memory_cache[key] = data
+                return data
+            except Exception:
+                # If Redis is not available, return from in-memory cache
+                return self._in_memory_cache.get(key)
 
     def del_key(self, key: Any):
         if key in self._cache:
             del self._cache[key]
-        return self.delete(key)
+        if key in self._in_memory_cache:
+            del self._in_memory_cache[key]
+        try:
+            return self.delete(key)
+        except Exception:
+            return 0  # Return 0 if Redis is not available
 
     def set_key(self, key: Any = None, value: Any = None):
         self._cache[key] = value
-        return self.set(key, value)
+        self._in_memory_cache[key] = value
+        try:
+            return self.set(key, value)
+        except Exception:
+            return True  # Return True even if Redis is not available
+    
+    # Add a method to check Redis availability
+    def is_redis_available(self):
+        try:
+            return self.ping()
+        except Exception:
+            return False
 
 
 # Try to use REDIS_URL from environment if available, otherwise use config values
 redis_url = os.getenv('REDIS_URL')
-if redis_url:
-    # Parse the URL and extract components
-    import urllib.parse
-    parsed = urllib.parse.urlparse(redis_url)
-    host = parsed.hostname
-    port = parsed.port or 6379
-    password = parsed.password
-    ssl = parsed.scheme == 'rediss'
-    
-    db = Redis(
-        host=host,
-        port=port,
-        password=password,
-        decode_responses=True,
-        ssl=ssl,
-        ssl_cert_reqs=None,
-    )
-else:
-    db = Redis(
-        host=HOST,
-        port=PORT,
-        password=PASSWORD if len(PASSWORD) > 1 else None,
-        decode_responses=True,
-        ssl=True,
-        ssl_cert_reqs=None,
-    )
+db = None
+connection_error = None
 
-
-if redis_url:
-    log.info(f"Starting redis using URL: {redis_url}")
-else:
-    log.info(f"Starting redis on {HOST}:{PORT}")
-
-if not db.ping():
+try:
     if redis_url:
-        log.error(f"Redis is not available at the provided URL")
+        # Parse the URL and extract components
+        import urllib.parse
+        parsed = urllib.parse.urlparse(redis_url)
+        host = parsed.hostname
+        port = parsed.port or 6379
+        password = parsed.password
+        ssl = parsed.scheme == 'rediss'
+        
+        log.info(f"Attempting to connect to Redis using URL: {redis_url}")
+        db = Redis(
+            host=host,
+            port=port,
+            password=password,
+            decode_responses=True,
+            ssl=ssl,
+            ssl_cert_reqs=None,
+        )
     else:
-        log.error(f"Redis is not available on {HOST}:{PORT}")
+        log.info(f"Attempting to connect to Redis on {HOST}:{PORT}")
+        db = Redis(
+            host=HOST,
+            port=PORT,
+            password=PASSWORD if len(PASSWORD) > 1 else None,
+            decode_responses=True,
+            ssl=True,
+            ssl_cert_reqs=None,
+        )
+    
+    # Test connection
+    if db.ping():
+        log.info("✅ Redis connection successful!")
+    else:
+        log.error("❌ Redis ping failed")
+        exit(1)
+        
+except Exception as e:
+    connection_error = str(e)
+    log.error(f"❌ Failed to connect to Redis: {e}")
+    log.error("Please check your Redis configuration:")
+    if redis_url:
+        log.error(f"- REDIS_URL: {redis_url}")
+    else:
+        log.error(f"- HOST: {HOST}")
+        log.error(f"- PORT: {PORT}")
+    log.error("Make sure the Redis server is running and accessible")
     exit(1)
