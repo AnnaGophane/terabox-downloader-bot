@@ -69,7 +69,7 @@ BOT_USERNAME = "teraboxdown_bot"
 # Force user to join this channel. (make sure you have promoted the bot on this chat.)
 FORCE_LINK = "@RoldexVerse"
 
-PUBLIC_EARN_API = ""  # https://publicearn.com/api
+CUTTLY_API_KEY = ""  # Your cutt.ly API key for URL shortening
 
 
 ```
