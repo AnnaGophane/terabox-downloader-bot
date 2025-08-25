@@ -7,7 +7,8 @@ from typing import Any
 
 from redis import Redis as r
 
-from config import HOST, PASSWORD, PORT
+import urllib.parse
+from config import PASSWORD
 
 log = logging.getLogger("telethon")
 
@@ -120,14 +121,23 @@ db = None
 connection_error = None
 
 try:
+    redis_url = os.getenv('REDIS_URL')
+    if redis_url:
+        parsed_url = urllib.parse.urlparse(redis_url)
+        HOST = parsed_url.hostname
+        PORT = parsed_url.port
+        PASSWORD = parsed_url.password
+    else:
+        # Fallback to config values if REDIS_URL is not set
+        from config import HOST, PORT, PASSWORD
+
     log.info(f"Attempting to connect to Redis on {HOST}:{PORT}")
     db = Redis(
         host=HOST,
         port=PORT,
         password=PASSWORD if len(PASSWORD) > 1 else None,
         decode_responses=True,
-        ssl=True,
-        ssl_cert_reqs=None,
+        ssl=False,  # Disable SSL for testing
     )
     
     # Test connection
