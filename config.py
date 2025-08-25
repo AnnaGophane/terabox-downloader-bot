@@ -35,8 +35,8 @@ COOKIE = os.getenv('TERABOX_COOKIE', '')
 
 
 # REDIS
-HOST = "redis-14201.c15.us-east-1-2.ec2.redns.redis-cloud.com:14201"  # redis host uri
-PORT = 6379  # redis port
+HOST = "redis-14201.c15.us-east-1-2.ec2.redns.redis-cloud.com"  # redis host uri
+PORT = 14201  # redis port
 PASSWORD = "1hlUwaWzkStWzk0AcdiSSUBIwkHBKARc"  # redis password
 
 PRIVATE_CHAT_ID = -1002315965012  # CHAT WHERE YOU WANT TO STORE VIDEOS
