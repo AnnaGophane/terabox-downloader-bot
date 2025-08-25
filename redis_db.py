@@ -115,40 +115,20 @@ class Redis(r):
             return False
 
 
-# Try to use REDIS_URL from environment if available, otherwise use config values
-redis_url = os.getenv('REDIS_URL')
+# Use configuration from config.py which now handles REDIS_URL parsing
 db = None
 connection_error = None
 
 try:
-    if redis_url:
-        # Parse the URL and extract components
-        import urllib.parse
-        parsed = urllib.parse.urlparse(redis_url)
-        host = parsed.hostname
-        port = parsed.port or 6379
-        password = parsed.password
-        ssl = parsed.scheme == 'rediss'
-        
-        log.info(f"Attempting to connect to Redis using URL: {redis_url}")
-        db = Redis(
-            host=host,
-            port=port,
-            password=password,
-            decode_responses=True,
-            ssl=ssl,
-            ssl_cert_reqs=None,
-        )
-    else:
-        log.info(f"Attempting to connect to Redis on {HOST}:{PORT}")
-        db = Redis(
-            host=HOST,
-            port=PORT,
-            password=PASSWORD if len(PASSWORD) > 1 else None,
-            decode_responses=True,
-            ssl=True,
-            ssl_cert_reqs=None,
-        )
+    log.info(f"Attempting to connect to Redis on {HOST}:{PORT}")
+    db = Redis(
+        host=HOST,
+        port=PORT,
+        password=PASSWORD if len(PASSWORD) > 1 else None,
+        decode_responses=True,
+        ssl=True,
+        ssl_cert_reqs=None,
+    )
     
     # Test connection
     if db.ping():
@@ -161,10 +141,7 @@ except Exception as e:
     connection_error = str(e)
     log.error(f"❌ Failed to connect to Redis: {e}")
     log.error("Please check your Redis configuration:")
-    if redis_url:
-        log.error(f"- REDIS_URL: {redis_url}")
-    else:
-        log.error(f"- HOST: {HOST}")
-        log.error(f"- PORT: {PORT}")
+    log.error(f"- HOST: {HOST}")
+    log.error(f"- PORT: {PORT}")
     log.error("Make sure the Redis server is running and accessible")
     exit(1)
